@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>美股財報學院 v2.2｜從零開始看懂美股財報</title>
+<style>
+:root{
+  --bg:#0b1020;--panel:#121a2f;--panel2:#17213a;--text:#edf2ff;--muted:#9fb0d0;
+  --line:#263653;--accent:#7dd3fc;--accent2:#a78bfa;--good:#86efac;--warn:#fde68a;--bad:#fca5a5;
+  --white:#fff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:linear-gradient(180deg,#08101e 0%,#0e1628 50%,#0b1020 100%);
+  color:var(--text);font-family:Inter,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  line-height:1.7;
+}
+a{color:var(--accent)}
+.wrap{max-width:1180px;margin:auto;padding:0 22px 80px}
+.hero{padding:58px 0 34px;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:13px;letter-spacing:.15em;color:var(--accent);font-weight:800;text-transform:uppercase}
+h1{font-size:clamp(36px,6vw,72px);line-height:1.03;margin:12px 0 20px;max-width:900px}
+.lead{font-size:19px;color:#c8d4ea;max-width:860px}
+.hero-grid,.grid2,.grid3,.metric-grid{display:grid;gap:16px}
+.hero-grid{grid-template-columns:2fr 1fr;margin-top:28px}
+.grid2{grid-template-columns:repeat(2,1fr)}
+.grid3{grid-template-columns:repeat(3,1fr)}
+.metric-grid{grid-template-columns:repeat(4,1fr)}
+.card,.metric,.quiz,.worksheet,.callout{
+  background:rgba(18,26,47,.92);border:1px solid var(--line);border-radius:18px;padding:22px;
+  box-shadow:0 12px 36px rgba(0,0,0,.18)
+}
+.metric strong{font-size:26px;display:block;margin-top:4px}
+.metric small,.muted{color:var(--muted)}
+.tag{display:inline-block;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:800;margin-right:6px}
+.fact{background:#12362a;color:var(--good)}
+.infer{background:#382d18;color:var(--warn)}
+.unknown{background:#3b2026;color:var(--bad)}
+nav{
+  position:sticky;top:0;z-index:20;background:rgba(8,16,30,.88);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);overflow:auto;white-space:nowrap
+}
+nav .wrap{padding:10px 22px}
+nav a{display:inline-block;color:#cbd7ee;text-decoration:none;margin-right:18px;font-size:14px;font-weight:700}
+section{padding:44px 0 6px}
+h2{font-size:30px;margin:0 0 12px}
+h3{font-size:21px;margin:0 0 8px}
+.kicker{color:var(--accent);font-weight:800;font-size:13px;letter-spacing:.08em}
+details{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:10px 0}
+summary{cursor:pointer;font-weight:800}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th,td{padding:13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:#bcd0ef}
+.progress-shell{height:10px;background:#1e2a44;border-radius:99px;overflow:hidden;margin-top:12px}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.25s}
+.step{display:grid;grid-template-columns:54px 1fr;gap:16px;margin:16px 0}
+.num{width:46px;height:46px;border-radius:14px;background:#1c2b4b;display:grid;place-items:center;font-weight:900;color:var(--accent)}
+.option{display:block;margin:8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.option:hover{background:#182542}
+button{
+  background:linear-gradient(90deg,#38bdf8,#8b5cf6);border:0;color:white;padding:10px 16px;border-radius:10px;
+  font-weight:800;cursor:pointer
+}
+input[type=text],input[type=number],textarea,select{
+  width:100%;background:#0d1528;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px;
+  margin:7px 0 12px
+}
+textarea{min-height:92px}
+hr{border:0;border-top:1px solid var(--line);margin:26px 0}
+.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#09111f;border:1px solid var(--line);padding:12px;border-radius:10px}
+.source{font-size:13px;color:var(--muted)}
+.checkrow{display:flex;gap:10px;align-items:flex-start;margin:9px 0}
+.mobile-note{display:none}
+@media(max-width:850px){
+  .hero-grid,.grid2,.grid3,.metric-grid{grid-template-columns:1fr}
+  .mobile-note{display:block}
+  h1{font-size:42px}
+}
+@media print{
+  nav,button,.quiz{display:none!important}
+  body{background:white;color:black}
+  .card,.metric,.worksheet,.callout,details{box-shadow:none;background:white;color:black;border-color:#ccc}
+  .muted,.source{color:#555}
+}
+
+.term{
+  display:inline-flex;align-items:center;gap:5px;
+  color:var(--text);border-bottom:1px dashed #6d87ad;
+  cursor:pointer;font-weight:800;text-decoration:none;
+}
+.term::after{
+  content:"?";font-size:10px;line-height:1;
+  width:16px;height:16px;border-radius:50%;
+  display:inline-grid;place-items:center;
+  background:#223250;color:var(--accent);font-weight:900
+}
+.term:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.glossary-strip{
+  display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0
+}
+.glossary-chip{
+  border:1px solid var(--line);background:#111b31;color:#d9e6fb;
+  border-radius:999px;padding:7px 11px;font-size:13px;font-weight:800;cursor:pointer
+}
+.glossary-chip:hover{background:#182743;color:white}
+.glossary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.glossary-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.glossary-card h3{font-size:17px;margin-bottom:5px}
+.glossary-card p{margin:0;color:#c5d2e8;font-size:14px}
+.glossary-card small{display:block;color:var(--accent);font-weight:800;margin-bottom:7px}
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(1,6,15,.72);backdrop-filter:blur(7px);
+  z-index:100;display:none;align-items:center;justify-content:center;padding:20px
+}
+.modal-backdrop.show{display:flex}
+.modal{
+  width:min(680px,100%);max-height:82vh;overflow:auto;
+  background:#111a2e;border:1px solid #314568;border-radius:20px;padding:24px;
+  box-shadow:0 30px 100px rgba(0,0,0,.45)
+}
+.modal-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.modal h3{font-size:26px;margin:0}
+.modal-close{
+  background:#1d2a45;padding:7px 10px;border-radius:10px;font-size:16px
+}
+.modal-section{padding:13px 0;border-top:1px solid var(--line)}
+.modal-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:900}
+.modal p{margin:5px 0 0;color:#d4def0}
+.term-example{
+  background:#0b1325;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px
+}
+@media(max-width:850px){.glossary-grid{grid-template-columns:1fr}}
+
+
+.filing-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap;margin:18px 0}
+.filing-actions{display:flex;gap:8px;flex-wrap:wrap}
+.linkbtn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:#15243d;border:1px solid var(--line);color:#dbeafe;padding:9px 12px;border-radius:10px;font-size:13px;font-weight:800}
+.linkbtn:hover{background:#1c3152;color:white}
+.statement-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.statement-tab{background:#10192b;border:1px solid var(--line);color:#aebdd5;padding:9px 13px;border-radius:10px}
+.statement-tab.active{background:#1d3152;color:#fff;border-color:#49678f}
+.statement-panel{display:none}.statement-panel.active{display:block}
+.statement-wrap{overflow:auto;background:rgba(13,21,40,.72);border:1px solid var(--line);border-radius:16px}
+.statement-table{min-width:760px;margin:0}
+.statement-table th{position:sticky;top:0;background:#111b30;z-index:2}
+.statement-table td.numcell,.statement-table th.numcell{text-align:right;font-variant-numeric:tabular-nums}
+.statement-table tr.major td{font-weight:900;color:#f2f6ff;background:rgba(36,55,88,.35)}
+.statement-table tr.section td{padding-top:20px;color:var(--accent);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:900}
+.row-note{display:block;margin-top:3px;color:#8ea4c7;font-size:11px;font-weight:500;line-height:1.45}
+body.clean-statements .row-note{display:none}
+.reading-callout{display:grid;grid-template-columns:42px 1fr;gap:12px;align-items:start;background:#0e192c;border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0}
+.reading-callout .icon{width:34px;height:34px;border-radius:10px;background:#1b2d4c;display:grid;place-items:center;font-weight:900;color:var(--accent)}
+.statement-legend{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin:10px 0}
+.statement-legend span{display:inline-flex;align-items:center;gap:6px}.dot{width:8px;height:8px;border-radius:50%;background:#6785ad}.dot.major{background:#c4d7f4}
+.data-status{display:inline-flex;align-items:center;gap:7px;background:#10291f;color:#9ef0ba;border:1px solid #24563d;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:800}
+@media(max-width:850px){.filing-head{align-items:flex-start}.filing-actions{width:100%}}
+
+
+.stocklab{padding-top:32px}
+.stock-picker{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+.stock-btn{
+  text-align:left;background:#101a2e;border:1px solid var(--line);color:#dce7fa;
+  padding:14px;border-radius:14px;cursor:pointer
+}
+.stock-btn.active{background:#1c2c4a;border-color:#5b7eaa;box-shadow:inset 0 0 0 1px #5b7eaa}
+.stock-btn small{display:block;color:var(--muted);font-size:11px}
+.stock-btn strong{font-size:18px}
+.company-hero{
+  display:grid;grid-template-columns:1.45fr .8fr;gap:16px;margin:16px 0
+}
+.company-name{font-size:32px;font-weight:900;margin:0}
+.company-sub{color:var(--muted);margin-top:3px}
+.company-chip{display:inline-block;padding:5px 9px;border:1px solid var(--line);border-radius:999px;font-size:12px;color:#c8d8ee;margin:4px 6px 0 0}
+.compare-table td,.compare-table th{white-space:nowrap}
+.focus-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.focus-box{background:#0e182a;border:1px solid var(--line);border-radius:13px;padding:14px}
+.focus-box b{display:block;margin-bottom:5px}
+.company-note{font-size:13px;color:#a9bad5}
+.source-note{font-size:12px;color:#8ea1bf;margin-top:10px}
+@media(max-width:850px){
+  .stock-picker{grid-template-columns:repeat(2,1fr)}
+  .company-hero,.focus-list{grid-template-columns:1fr}
+}
+
+
+.compare-academy{padding-top:36px}
+.mode-switch{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.mode-btn{background:#10192b;border:1px solid var(--line);color:#afbdd3;padding:10px 14px;border-radius:11px;font-weight:800}
+.mode-btn.active{background:#203353;color:#fff;border-color:#5a7da8}
+.compare-panel{display:none}.compare-panel.active{display:block}
+.rule-card{
+  display:grid;grid-template-columns:54px 1fr;gap:14px;align-items:start;
+  background:#0f192b;border:1px solid var(--line);border-radius:16px;padding:16px
+}
+.rule-num{width:46px;height:46px;border-radius:13px;background:#1d3150;color:var(--accent);font-size:20px;font-weight:900;display:grid;place-items:center}
+.metric-delta.up{color:var(--good)} .metric-delta.down{color:var(--bad)} .metric-delta.flat{color:var(--muted)}
+.self-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.self-summary .card{padding:16px}
+.compare-note{font-size:13px;color:#a8b8cf}
+.peer-filter{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.peer-filter button{background:#111a2d;border:1px solid var(--line);color:#bdcbe0;padding:8px 11px;border-radius:999px}
+.peer-filter button.active{background:#1d3152;color:#fff}
+.ratio-table td,.ratio-table th{text-align:right}.ratio-table td:first-child,.ratio-table th:first-child{text-align:left}
+.lesson-banner{
+  background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(139,92,246,.12));
+  border:1px solid #324766;border-radius:18px;padding:20px;margin:16px 0
+}
+@media(max-width:850px){.self-summary{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+<nav>
+  <div class="wrap">
+    <a href="#start">起點</a><a href="#stocklab">選股實驗室</a><a href="#compareacademy">財報趨勢</a><a href="#glossary">名詞小字典</a><a href="#map">財報地圖</a><a href="#mrvl">MRVL 實戰</a><a href="#official">正式財報</a>
+    <a href="#read">閱讀順序</a><a href="#gaap">GAAP vs Non-GAAP</a><a href="#guidance">Guidance</a>
+    <a href="#judge">判斷框架</a><a href="#quiz">小測驗</a><a href="#worksheet">作業單</a>
+  </div>
+</nav>
+
+<div class="wrap">
+<header class="hero" id="start">
+  <div class="eyebrow">US Stock Financial Statement Academy · v2.2</div>
+  <h1>從「看不懂財報」到能自己判斷一季到底發生什麼。</h1>
+  <p class="lead">
+    這不是要把你訓練成會計師，而是讓你成為能看懂自己持股的投資人。
+    我們先用 Marvell 建立基本功，再進階切換 Apple、NVIDIA、AMD；v2.2 專注在「每家公司自己跟自己的歷史財報比」，
+    每個名詞都回答三件事：它是什麼、為什麼重要、你看 MRVL 時該盯哪裡。
+  </p>
+  <div class="hero-grid">
+    <div class="card">
+      <span class="tag fact">事實</span><span class="tag infer">推論</span><span class="tag unknown">未知</span>
+      <h3 style="margin-top:14px">本課程最重要的習慣</h3>
+      <p>財報不是「好／壞」二選一。你每次都要把資訊拆成：已公布的事實、根據事實做出的推論，以及現在還不知道、需要下一份證據驗證的未知數。</p>
+    </div>
+    <div class="card">
+      <div class="kicker">你的學習進度</div>
+      <strong id="progressText">0 / 8 個核心概念</strong>
+      <div class="progress-shell"><div class="progress-bar" id="progressBar"></div></div>
+      <p class="muted">勾完每章的「我懂了」後，進度會保存在這台瀏覽器。</p>
+    </div>
+  </div>
+</header>
+
+
+<section id="stocklab" class="stocklab">
+  <div class="kicker">ADVANCED · 多公司財報學院</div>
+  <h2>選一家公司，用同一套方法讀它的最新財報</h2>
+  <p class="muted">先不要問哪一檔「比較好」。這個階段的目標，是學會辨認：不同公司的財報，真正重要的問題不一樣。</p>
+
+  <div class="stock-picker">
+    <button class="stock-btn active" data-stock="MRVL"><small>Custom Silicon / Networking</small><strong>MRVL</strong><br>Marvell</button>
+    <button class="stock-btn" data-stock="AAPL"><small>Devices + Services</small><strong>AAPL</strong><br>Apple</button>
+    <button class="stock-btn" data-stock="NVDA"><small>AI Accelerators / Data Center</small><strong>NVDA</strong><br>NVIDIA</button>
+    <button class="stock-btn" data-stock="AMD"><small>CPU / GPU / Data Center</small><strong>AMD</strong><br>Advanced Micro Devices</button>
+  </div>
+
+  <div class="company-hero">
+    <div class="card">
+      <div class="kicker" id="labQuarter"></div>
+      <h3 class="company-name" id="labName"></h3>
+      <div class="company-sub" id="labTheme"></div>
+      <div id="labChips" style="margin-top:10px"></div>
+      <p id="labLesson" style="margin-top:16px"></p>
+      <div class="filing-actions" id="labLinks"></div>
+    </div>
+    <div class="card">
+      <div class="kicker">這家公司最先學什麼？</div>
+      <h3 id="labFocusTitle"></h3>
+      <p id="labFocusText"></p>
+      <p class="company-note" id="labCaution"></p>
+    </div>
+  </div>
+
+  <div class="metric-grid" id="labMetrics"></div>
+
+  <div class="grid2" style="margin-top:16px">
+    <div class="card">
+      <h3>正式損益表速讀</h3>
+      <p class="muted">單位：十億美元，EPS 除外。保留正式科目邏輯，但只放第一輪最值得看的幾行。</p>
+      <div class="statement-wrap">
+        <table class="statement-table" id="labPnl">
+          <thead><tr><th>科目</th><th class="numcell">本季</th><th class="numcell">去年同期</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="source-note" id="labSourceNote"></p>
+    </div>
+    <div class="card">
+      <h3>這家公司真正要拆哪裡？</h3>
+      <div id="labBreakdown"></div>
+    </div>
+  </div>
+
+  <div class="focus-list">
+    <div class="focus-box"><span class="tag fact">事實</span><b id="labFactTitle"></b><div id="labFact"></div></div>
+    <div class="focus-box"><span class="tag infer">推論</span><b id="labInferTitle"></b><div id="labInfer"></div></div>
+    <div class="focus-box"><span class="tag unknown">未知</span><b id="labUnknownTitle"></b><div id="labUnknown"></div></div>
+  </div>
+
+
+</section>
+
+
+
+<section id="compareacademy" class="compare-academy">
+  <div class="kicker">V2.2 · 財報趨勢學院</div>
+  <h2>每家公司，只跟自己的過去比</h2>
+
+  <div class="lesson-banner">
+    <h3>這一版只保留一件事：看公司自己有沒有變好</h3>
+    <p>
+      你不需要拿 Apple、NVIDIA、AMD、MRVL 的毛利率或 EPS 互相比高低。
+      對目前的學習階段，更重要的是先回答：
+      <b>同一家公司現在比去年更好，還是更差？</b>
+    </p>
+    <p class="compare-note">
+      這樣可以避開公司規模、產品結構、財年、會計調整與商業模式不同造成的干擾。
+    </p>
+  </div>
+
+  <div class="grid2">
+    <div class="rule-card">
+      <div class="rule-num">1</div>
+      <div>
+        <h3>YoY｜本季 vs 去年同季</h3>
+        <p>先看 Revenue、Gross Profit、Operating Income、Net Income、EPS 的一年變化。</p>
+        <p class="muted">這是最穩定的第一層比較，也比較不容易被季節性干擾。</p>
+      </div>
+    </div>
+    <div class="rule-card">
+      <div class="rule-num">2</div>
+      <div>
+        <h3>QoQ｜本季 vs 上一季</h3>
+        <p>再看公司最近是在加速還是減速。</p>
+        <p class="muted">QoQ 比較適合搭配 YoY 使用，不建議只看單一季就下長期結論。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="filing-head">
+    <div>
+      <h3>選一家公司，看它自己的趨勢</h3>
+      <p class="muted">
+        目前以「本季 vs 去年同期」為共同比較基準。MRVL 另外保留上一季數字，
+        可以在正式財報閱讀室繼續做 QoQ 練習。
+      </p>
+    </div>
+    <select id="selfCompareTicker" style="width:auto;min-width:180px">
+      <option value="MRVL">MRVL · Marvell</option>
+      <option value="AAPL">AAPL · Apple</option>
+      <option value="NVDA">NVDA · NVIDIA</option>
+      <option value="AMD">AMD · AMD</option>
+    </select>
+  </div>
+
+  <div class="self-summary" id="selfSummary"></div>
+
+  <div class="statement-wrap">
+    <table class="statement-table">
+      <thead>
+        <tr>
+          <th>指標</th>
+          <th class="numcell">本季</th>
+          <th class="numcell">去年同期</th>
+          <th class="numcell">變化</th>
+          <th>怎麼解讀</th>
+        </tr>
+      </thead>
+      <tbody id="selfCompareBody"></tbody>
+    </table>
+  </div>
+
+  <div class="reading-callout">
+    <div class="icon">★</div>
+    <div id="selfInterpretation"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3>固定閱讀順序</h3>
+    <p>
+      <b>Revenue</b> 看公司有沒有長大 →
+      <b>Gross Profit / Gross Margin</b> 看產品經濟性 →
+      <b>Operating Income</b> 看本業效率 →
+      <b>Net Income / EPS</b> 看最後落到股東的結果 →
+      <b>Cash Flow</b> 驗證獲利品質。
+    </p>
+    <p class="muted">
+      同一家公司連續看 4～8 季後，你會比單純做跨公司比較更容易建立真正的財報直覺。
+    </p>
+  </div>
+</section>
+
+<section id="glossary">
+  <div class="kicker">00 · 新手名詞小字典</div>
+  <h2>看到不懂的字，先不要跳過</h2>
+  <p class="muted">頁面裡有虛線底線與「?」的詞都可以點。你不需要一次背完，只要知道它在回答公司哪一個問題。</p>
+  <div class="glossary-strip">
+    <button class="glossary-chip" data-term="earnings_release">Earnings Release</button>
+    <button class="glossary-chip" data-term="income_statement">Income Statement</button>
+    <button class="glossary-chip" data-term="revenue">Revenue</button>
+    <button class="glossary-chip" data-term="yoy">YoY</button>
+    <button class="glossary-chip" data-term="qoq">QoQ</button>
+    <button class="glossary-chip" data-term="gross_margin">Gross Margin</button>
+    <button class="glossary-chip" data-term="operating_margin">Operating Margin</button>
+    <button class="glossary-chip" data-term="eps">EPS</button>
+    <button class="glossary-chip" data-term="operating_cash_flow">Operating Cash Flow</button>
+    <button class="glossary-chip" data-term="guidance">Guidance</button>
+    <button class="glossary-chip" data-term="gaap">GAAP</button>
+    <button class="glossary-chip" data-term="non_gaap">Non-GAAP</button>
+  </div>
+</section>
+
+<section id="map">
+  <div class="kicker">01 · 財報地圖</div>
+  <h2>你其實只需要先認識 4 個東西</h2>
+  <div class="grid2">
+    <div class="card"><h3>① <span class="term" data-term="earnings_release">Earnings Release</span></h3><p>公司自己整理的財報摘要。最快看營收、EPS、毛利率、下一季 Guidance。新手第一站。</p></div>
+    <div class="card"><h3>② <span class="term" data-term="income_statement">Income Statement</span></h3><p>損益表。回答：公司這一季賣多少、花多少、最後賺多少。</p></div>
+    <div class="card"><h3>③ <span class="term" data-term="balance_sheet">Balance Sheet</span></h3><p>資產負債表。回答：公司手上有什麼、欠多少錢、資本結構穩不穩。</p></div>
+    <div class="card"><h3>④ <span class="term" data-term="cash_flow_statement">Cash Flow Statement</span></h3><p>現金流量表。回答：帳面上的獲利，有沒有真的變成現金。</p></div>
+  </div>
+  <details><summary>那 10-Q / 10-K 又是什麼？</summary>
+    <p><b><span class="term" data-term="ten_q">10-Q</span></b> 是美國上市公司的季度正式申報文件，<b><span class="term" data-term="ten_k">10-K</span></b> 是年度正式申報文件。它們比 Earnings Release 更完整，也包含會計政策、風險、債務、併購與管理層討論。你的學習順序不是一開始硬啃 10-Q，而是先從摘要讀懂，再進 10-Q 驗證。</p>
+  </details>
+  <label class="checkrow"><input type="checkbox" class="learn" data-key="map"> 我已經能分辨 Earnings Release、損益表、資產負債表、現金流與 10-Q。</label>
+</section>
+
+<section id="mrvl">
+  <div class="kicker">02 · MRVL FY2027 Q2</div>
+  <h2>先只看這 8 個數字</h2>
+  <p class="muted">季度截至 2026-08-01。以下數字取自 Marvell 官方 FY2027 Q2 Earnings Release / 10-Q。</p>
+  <div class="metric-grid">
+    <div class="metric"><small><span class="term" data-term="revenue">Revenue</span></small><strong>$2.739B</strong><span class="good">YoY +37%</span></div>
+    <div class="metric"><small><span class="term" data-term="qoq">QoQ Revenue</span></small><strong>+13.3%</strong><span class="muted">Q1 $2.418B → Q2 $2.739B</span></div>
+    <div class="metric"><small><span class="term" data-term="gaap_gross_margin">GAAP Gross Margin</span></small><strong>53.1%</strong><span class="good">去年同期 50.4%</span></div>
+    <div class="metric"><small><span class="term" data-term="non_gaap_gross_margin">Non-GAAP GM</span></small><strong>58.9%</strong><span class="muted">需理解調整項目</span></div>
+    <div class="metric"><small><span class="term" data-term="gaap_eps">GAAP EPS</span></small><strong>$0.33</strong><span class="muted">每股會計獲利</span></div>
+    <div class="metric"><small><span class="term" data-term="non_gaap_eps">Non-GAAP EPS</span></small><strong>$0.94</strong><span class="muted">市場常關注，但不能單看</span></div>
+    <div class="metric"><small><span class="term" data-term="operating_cash_flow">Operating Cash Flow</span></small><strong>$605.5M</strong><span class="good">實際營業現金流</span></div>
+    <div class="metric"><small>Q3 <span class="term" data-term="revenue_guidance">Revenue Guidance</span></small><strong>$3.15B ±5%</strong><span class="good">指向續增長</span></div>
+  </div>
+
+  <div class="callout" style="margin-top:18px">
+    <span class="tag fact">事實</span>
+    <p>Q2 營收 27.39 億美元，較去年同期成長 37%；資料中心業務年增 46%。GAAP 毛利率 53.1%，營業現金流 6.055 億美元。公司 Q3 營收指引中位數為 31.5 億美元。</p>
+    <span class="tag infer">推論</span>
+    <p>已公布數據支持「MRVL 的核心營運目前仍在成長」，但不能單憑這些數字推出「股票一定被低估」。</p>
+    <span class="tag unknown">未知</span>
+    <p>未來 custom silicon 專案能否準時量產、收入品質與獲利率能否維持、目前估值是否已經反映大部分成長，仍需要後續證據。</p>
+  </div>
+  <label class="checkrow"><input type="checkbox" class="learn" data-key="eight"> 我知道先抓 8 個核心數字，而不是一開始從 10-Q 第一頁讀到最後。</label>
+</section>
+
+
+<section id="official">
+  <div class="kicker">02.5 · 官方財報閱讀室</div>
+  <div class="filing-head">
+    <div>
+      <h2>直接看 MRVL 正式財報，但不再被整片數字淹沒</h2>
+      <p class="muted" style="max-width:820px">下方數字來自 Marvell FY2027 Q2 官方 8-K 財報附件與 10-Q。科目順序依官方報表整理；灰色小字是我的教學註解，不是 Marvell 原文。單位除每股數字外皆為百萬美元。</p>
+      <span class="data-status">✓ FY2027 Q2 · 官方數據 · 2026-08-27 / 08-28</span>
+    </div>
+    <div class="filing-actions">
+      <button id="annotationToggle" onclick="toggleStatementNotes()">教學標註：ON</button>
+      <a class="linkbtn" target="_blank" href="https://investor.marvell.com/sec-filings/all-sec-filings/content/0001835632-26-000022/q227_8kx812026ex-991.htm">官方 8-K / Earnings Release ↗</a>
+      <a class="linkbtn" target="_blank" href="https://investor.marvell.com/sec-filings/all-sec-filings/content/0001835632-26-000025/mrvl-20260801.htm">官方 10-Q ↗</a>
+    </div>
+  </div>
+
+  <div class="reading-callout"><div class="icon">1</div><div><b>第一次看正式財報，不需要每一行都懂。</b>先在損益表找 Revenue → Gross Profit → Operating Income → Net Income → EPS；再到資產負債表找 Cash / Debt；最後到現金流量表找 Operating Cash Flow。</div></div>
+
+  <div class="statement-tabs">
+    <button class="statement-tab active" data-panel="ops">① 損益表 Operations</button>
+    <button class="statement-tab" data-panel="bs">② 資產負債表 Balance Sheet</button>
+    <button class="statement-tab" data-panel="cf">③ 現金流量表 Cash Flow</button>
+  </div>
+  <div class="statement-legend"><span><i class="dot major"></i>粗體底色＝新手第一輪必看</span><span><i class="dot"></i>灰色小字＝教學註解，可關閉</span></div>
+
+  <div class="statement-panel active" id="panel-ops">
+    <h3>Condensed Consolidated Statements of Operations <span class="muted">（Unaudited）</span></h3>
+    <p class="muted">這張表回答：「這一季做多少生意、花掉多少、最後賺多少？」</p>
+    <div class="statement-wrap"><table class="statement-table">
+      <tr><th>科目</th><th class="numcell">FY27 Q2<br><small>Aug 1, 2026</small></th><th class="numcell">FY27 Q1<br><small>May 2, 2026</small></th><th class="numcell">FY26 Q2<br><small>Aug 2, 2025</small></th></tr>
+      <tr class="major"><td><span class="term" data-term="revenue">Net revenue</span><span class="row-note">第一站：公司這季做了多少生意？</span></td><td class="numcell">$2,739.3</td><td class="numcell">$2,417.8</td><td class="numcell">$2,006.1</td></tr>
+<tr><td><span class="term" data-term="cogs">Cost of goods sold</span><span class="row-note">直接為產品／服務付出的成本。</span></td><td class="numcell">1,283.7</td><td class="numcell">1,157.0</td><td class="numcell">995.5</td></tr>
+<tr class="major"><td><span class="term" data-term="gross_profit">Gross profit</span><span class="row-note">Revenue 減掉直接成本後還剩多少。</span></td><td class="numcell">1,455.6</td><td class="numcell">1,260.8</td><td class="numcell">1,010.6</td></tr>
+<tr class="section"><td colspan="4">Operating expenses｜營運費用</td></tr>
+<tr><td><span class="term" data-term="rd">Research and development</span><span class="row-note">研發新晶片與技術的費用。半導體公司很重要。</span></td><td class="numcell">741.1</td><td class="numcell">652.3</td><td class="numcell">519.0</td></tr>
+<tr><td><span class="term" data-term="sga">Selling, general and administrative</span><span class="row-note">業務、行政、法務、人資等營運費用。</span></td><td class="numcell">257.6</td><td class="numcell">258.4</td><td class="numcell">192.8</td></tr>
+<tr><td>Restructuring related charges (gains), net<span class="row-note">重整相關費用或收益，不一定代表日常核心營運。</span></td><td class="numcell">(2.8)</td><td class="numcell">10.7</td><td class="numcell">8.7</td></tr>
+<tr><td>Total operating expenses<span class="row-note">主要營運費用合計。</span></td><td class="numcell">995.9</td><td class="numcell">921.4</td><td class="numcell">720.5</td></tr>
+<tr class="major"><td><span class="term" data-term="operating_income">Operating income</span><span class="row-note">核心本業在營運費用後真正留下多少。</span></td><td class="numcell">459.7</td><td class="numcell">339.4</td><td class="numcell">290.1</td></tr>
+<tr><td>Interest expense<span class="row-note">借款產生的利息成本。</span></td><td class="numcell">(61.6)</td><td class="numcell">(52.8)</td><td class="numcell">(51.9)</td></tr>
+<tr><td>Other expense, net<span class="row-note">其他非核心營運項目的淨損益。</span></td><td class="numcell">(19.8)</td><td class="numcell">(203.3)</td><td class="numcell">(4.5)</td></tr>
+<tr><td>Income before income taxes<span class="row-note">扣稅之前的獲利。</span></td><td class="numcell">378.3</td><td class="numcell">83.3</td><td class="numcell">233.7</td></tr>
+<tr><td>Provision for income taxes<span class="row-note">本期所得稅費用。</span></td><td class="numcell">70.3</td><td class="numcell">48.8</td><td class="numcell">38.9</td></tr>
+<tr class="major"><td><span class="term" data-term="net_income">Net income</span><span class="row-note">最後真正歸到公司的 GAAP 淨利。</span></td><td class="numcell">$308.0</td><td class="numcell">$34.5</td><td class="numcell">$194.8</td></tr>
+<tr class="major"><td><span class="term" data-term="gaap_eps">Net income per share — diluted</span><span class="row-note">GAAP diluted EPS：淨利分攤到稀釋後每一股。</span></td><td class="numcell">$0.33</td><td class="numcell">$0.04</td><td class="numcell">$0.22</td></tr>
+<tr><td><span class="term" data-term="diluted_shares">Weighted-average shares — diluted</span><span class="row-note">計算 diluted EPS 的平均股數，可觀察稀釋。</span></td><td class="numcell">921.2</td><td class="numcell">893.3</td><td class="numcell">870.4</td></tr>
+    </table></div>
+    <div class="reading-callout"><div class="icon">→</div><div><b>現在試著自己讀：</b>Revenue、Gross profit、Operating income 與 Net income 都高於去年同期。這支持「已公布營運成長」，但不能直接證明股票便宜。</div></div>
+  </div>
+
+  <div class="statement-panel" id="panel-bs">
+    <h3>Condensed Consolidated Balance Sheets <span class="muted">（Unaudited）</span></h3>
+    <p class="muted">這不是「一季賺多少」，而是某一天公司的財務快照。</p>
+    <div class="statement-wrap"><table class="statement-table">
+      <tr><th>科目</th><th class="numcell">Aug 1, 2026</th><th class="numcell">Jan 31, 2026</th></tr>
+      <tr class="section"><td colspan="3">Assets｜資產</td></tr>
+<tr class="major"><td><span class="term" data-term="cash">Cash and cash equivalents</span><span class="row-note">最直觀的現金安全墊。</span></td><td class="numcell">$3,932.8</td><td class="numcell">$2,638.8</td></tr>
+<tr><td><span class="term" data-term="accounts_receivable">Accounts receivable, net</span><span class="row-note">已認列收入、但客戶還沒付進來的款項。</span></td><td class="numcell">2,218.4</td><td class="numcell">2,186.6</td></tr>
+<tr><td><span class="term" data-term="inventory">Inventories</span><span class="row-note">存貨。上升可能是備貨，也可能是需求風險。</span></td><td class="numcell">1,360.6</td><td class="numcell">1,388.0</td></tr>
+<tr><td>Prepaid expenses and other current assets</td><td class="numcell">407.5</td><td class="numcell">247.2</td></tr>
+<tr class="major"><td>Total current assets<span class="row-note">一年內較可能變現或使用的資產合計。</span></td><td class="numcell">7,919.3</td><td class="numcell">6,460.6</td></tr>
+<tr><td>Property and equipment, net</td><td class="numcell">1,071.0</td><td class="numcell">935.0</td></tr>
+<tr><td><span class="term" data-term="goodwill">Goodwill</span><span class="row-note">多半來自併購，不能把它當成現金。</span></td><td class="numcell">13,873.9</td><td class="numcell">11,062.2</td></tr>
+<tr><td>Acquired intangible assets, net<span class="row-note">併購取得的技術、客戶關係等無形資產。</span></td><td class="numcell">2,346.6</td><td class="numcell">1,754.7</td></tr>
+<tr class="major"><td>Total assets</td><td class="numcell">$27,554.6</td><td class="numcell">$22,285.3</td></tr>
+<tr class="section"><td colspan="3">Liabilities｜負債</td></tr>
+<tr><td>Accounts payable<span class="row-note">公司欠供應商、尚未支付的款項。</span></td><td class="numcell">$797.9</td><td class="numcell">$1,073.8</td></tr>
+<tr><td>Accrued liabilities</td><td class="numcell">1,425.8</td><td class="numcell">1,337.1</td></tr>
+<tr><td>Short-term debt<span class="row-note">一年內到期的借款。</span></td><td class="numcell">—</td><td class="numcell">499.8</td></tr>
+<tr class="major"><td>Total current liabilities</td><td class="numcell">2,499.5</td><td class="numcell">3,220.5</td></tr>
+<tr class="major"><td><span class="term" data-term="long_term_debt">Long-term debt</span><span class="row-note">長期借款。讀 Balance Sheet 時一定跟 Cash 一起看。</span></td><td class="numcell">4,962.9</td><td class="numcell">3,970.8</td></tr>
+<tr><td>Other non-current liabilities</td><td class="numcell">1,560.6</td><td class="numcell">785.6</td></tr>
+<tr class="major"><td>Total liabilities</td><td class="numcell">9,023.0</td><td class="numcell">7,976.9</td></tr>
+<tr class="section"><td colspan="3">Stockholders' Equity｜股東權益</td></tr>
+<tr class="major"><td>Total stockholders’ equity<span class="row-note">會計上的資產減負債後，歸屬股東的淨值。</span></td><td class="numcell">18,531.6</td><td class="numcell">14,308.4</td></tr>
+<tr><td>Total liabilities and stockholders’ equity</td><td class="numcell">$27,554.6</td><td class="numcell">$22,285.3</td></tr>
+    </table></div>
+    <div class="reading-callout"><div class="icon">?</div><div><b>跨表思考：</b>Cash 從 26.39 億美元升到 39.33 億美元，但 Long-term debt 也從 39.71 億升到 49.63 億。不能只看到現金增加就下結論，下一張 Cash Flow 會告訴你現金從哪裡來。</div></div>
+  </div>
+
+  <div class="statement-panel" id="panel-cf">
+    <h3>Condensed Consolidated Statements of Cash Flows <span class="muted">（Unaudited）</span></h3>
+    <p class="muted">這張表回答：「現金為什麼變多或變少？」</p>
+    <div class="statement-wrap"><table class="statement-table">
+      <tr><th>科目</th><th class="numcell">FY27 Q2<br><small>3 months</small></th><th class="numcell">FY26 Q2<br><small>3 months</small></th></tr>
+      <tr class="section"><td colspan="3">Operating activities｜營業活動</td></tr>
+<tr><td><span class="term" data-term="net_income">Net income</span><span class="row-note">從損益表的淨利出發。</span></td><td class="numcell">$308.0</td><td class="numcell">$194.8</td></tr>
+<tr><td>Depreciation and amortization</td><td class="numcell">93.1</td><td class="numcell">84.1</td></tr>
+<tr><td><span class="term" data-term="stock_comp">Stock-based compensation</span><span class="row-note">不是當期現金流出，但會影響股東稀釋。</span></td><td class="numcell">326.2</td><td class="numcell">153.6</td></tr>
+<tr><td>Amortization of acquired intangible assets</td><td class="numcell">214.9</td><td class="numcell">243.7</td></tr>
+<tr><td><span class="term" data-term="accounts_receivable">Accounts receivable change</span><span class="row-note">負數代表更多現金卡在尚未收款的應收帳款。</span></td><td class="numcell">(346.6)</td><td class="numcell">(307.7)</td></tr>
+<tr><td><span class="term" data-term="inventory">Inventories change</span><span class="row-note">這裡正負號反映存貨變動對現金的影響。</span></td><td class="numcell">48.3</td><td class="numcell">15.4</td></tr>
+<tr class="major"><td><span class="term" data-term="operating_cash_flow">Net cash provided by operating activities</span><span class="row-note">第一輪看現金流最重要的一行。</span></td><td class="numcell">$605.5</td><td class="numcell">$461.6</td></tr>
+<tr class="section"><td colspan="3">Investing activities｜投資活動</td></tr>
+<tr><td><span class="term" data-term="capex">Purchases of property and equipment</span><span class="row-note">常簡稱 CapEx，是估算 Free Cash Flow 的重要項目。</span></td><td class="numcell">(126.7)</td><td class="numcell">(47.5)</td></tr>
+<tr class="major"><td>Net cash used in investing activities</td><td class="numcell">(130.3)</td><td class="numcell">(77.2)</td></tr>
+<tr class="section"><td colspan="3">Financing activities｜融資活動</td></tr>
+<tr><td>Repurchases of common stock<span class="row-note">公司買回自己的股票。</span></td><td class="numcell">(200.0)</td><td class="numcell">(200.0)</td></tr>
+<tr><td>Dividend payments to stockholders</td><td class="numcell">(53.9)</td><td class="numcell">(51.7)</td></tr>
+<tr><td>Proceeds from borrowings</td><td class="numcell">—</td><td class="numcell">998.6</td></tr>
+<tr><td>Principal payments of debt</td><td class="numcell">—</td><td class="numcell">(757.8)</td></tr>
+<tr class="major"><td>Net cash provided by (used in) financing activities</td><td class="numcell">(386.0)</td><td class="numcell">(45.9)</td></tr>
+<tr class="major"><td>Net increase in cash and cash equivalents<span class="row-note">三大類現金流加總後，這一季現金增加多少。</span></td><td class="numcell">89.2</td><td class="numcell">338.5</td></tr>
+<tr class="major"><td><span class="term" data-term="cash">Cash and cash equivalents at end of period</span></td><td class="numcell">$3,932.8</td><td class="numcell">$1,224.4</td></tr>
+    </table></div>
+    <div class="reading-callout"><div class="icon">★</div><div><b>第一個真正財報練習：</b>Q2 Net income 是 3.08 億美元，但 Operating Cash Flow 是 6.055 億美元。不要直接說「現金流比淨利好，所以一定很棒」，要繼續看中間的調整項目，例如 Stock-based compensation 3.262 億美元。</div></div>
+  </div>
+
+  <details style="margin-top:16px"><summary>這算不算「正式財報」？</summary>
+    <p>這裡採用的是<b>官方數字＋官方科目順序的教學版重排</b>，不是將整份 SEC 文件截圖或全文複製。你可以在同一頁學會看表；需要查完整註腳、Risk Factors、MD&amp;A 與會計政策時，再點上面的官方 10-Q 進入原始文件。</p>
+  </details>
+</section>
+
+<section id="read">
+  <div class="kicker">03 · 固定閱讀順序</div>
+  <h2>每季都照這個順序，20 分鐘先建立骨架</h2>
+  <div class="step"><div class="num">1</div><div><h3><span class="term" data-term="revenue">Revenue</span>：公司有沒有長大？</h3><p>先看營收本身，再看 YoY 與 QoQ。MRVL Q2 Revenue $2.739B，YoY +37%，相較 Q1 $2.418B 約 QoQ +13.3%。</p><div class="formula">YoY =（本季營收 − 去年同季）÷ 去年同季</div></div></div>
+  <div class="step"><div class="num">2</div><div><h3><span class="term" data-term="gross_margin">Gross Margin</span>：每賣 100 元先留下多少？</h3><p>GAAP Gross Margin 53.1%，代表扣除直接產品成本後，每 100 美元營收約留下 53.1 美元，再拿去支付研發、行政、利息、稅等。</p></div></div>
+  <div class="step"><div class="num">3</div><div><h3><span class="term" data-term="operating_margin">Operating Margin</span>：公司本業最後留下多少？</h3><p>營業利益率比毛利率多扣掉 R&D、SG&A 等營運費用。對半導體公司尤其重要，因為研發支出很大。</p></div></div>
+  <div class="step"><div class="num">4</div><div><h3><span class="term" data-term="eps">EPS</span>：這些獲利分到每一股是多少？</h3><p>你買的是「股份」，不是營收。因此最後要看每股獲利。MRVL Q2 GAAP EPS $0.33、Non-GAAP EPS $0.94，差距很大，下一章會拆。</p></div></div>
+  <div class="step"><div class="num">5</div><div><h3><span class="term" data-term="cash_flow">Cash Flow</span>：錢真的進來了嗎？</h3><p>MRVL Q2 Operating Cash Flow $605.5M。獲利與現金不同，快速成長公司尤其要確認成長沒有只留在會計帳面。</p></div></div>
+  <div class="step"><div class="num">6</div><div><h3><span class="term" data-term="guidance">Guidance</span>：管理層告訴你下一季看哪裡</h3><p>MRVL Q3 revenue guidance 中位數 $3.15B，non-GAAP EPS $1.10 ± $0.05。市場交易的往往不是「上一季」，而是下一季甚至下一年。</p></div></div>
+  <label class="checkrow"><input type="checkbox" class="learn" data-key="order"> 我已記住 Revenue → Margin → EPS → Cash Flow → Guidance 的基本閱讀順序。</label>
+</section>
+
+<section id="gaap">
+  <div class="kicker">04 · 新手最容易卡住的地方</div>
+  <h2>GAAP 與 Non-GAAP：為什麼同一家公司有兩套 EPS？</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3><span class="term" data-term="gaap">GAAP</span></h3>
+      <p>依美國一般公認會計原則計算。優點是規則較一致、較完整反映所有會計成本。</p>
+      <p><b>MRVL Q2：</b>EPS $0.33，Gross Margin 53.1%。</p>
+    </div>
+    <div class="card">
+      <h3><span class="term" data-term="non_gaap">Non-GAAP</span></h3>
+      <p>公司把部分項目排除後呈現「核心營運」結果。MRVL 常排除股票薪酬、併購取得無形資產攤銷等。</p>
+      <p><b>MRVL Q2：</b>EPS $0.94，Gross Margin 58.9%。</p>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:16px">
+    <h3>新手規則：兩個都看，永遠不要只挑比較漂亮的那個。</h3>
+    <p>如果 Non-GAAP 比 GAAP 好很多，你的問題不該是「哪個是真的？」而是：「被排除的成本是一次性的，還是其實每年都反覆發生？」股票薪酬就是很典型的例子。它不是現金支出，但會增加股份、稀釋每股價值。</p>
+  </div>
+  <label class="checkrow"><input type="checkbox" class="learn" data-key="gaap"> 我理解 GAAP / Non-GAAP 都有用途，而且知道要追問被排除的項目。</label>
+</section>
+
+<section id="guidance">
+  <div class="kicker">05 · 市場最在意的區域</div>
+  <h2>Guidance 為什麼常常比「上一季 beat」更重要？</h2>
+  <p>股價反映的是市場對未來的預期。財報公布時，同時存在三組數字：</p>
+  <table>
+    <tr><th>層次</th><th>問題</th><th>MRVL 新手怎麼看</th></tr>
+    <tr><td><span class="term" data-term="actual">Actual</span></td><td>上一季實際做到什麼？</td><td>Q2 Revenue $2.739B；Non-GAAP EPS $0.94</td></tr>
+    <tr><td><span class="term" data-term="previous_guidance">Previous Guidance</span></td><td>公司之前自己答應什麼？</td><td>Q2 Revenue midpoint $2.700B；Non-GAAP EPS $0.93</td></tr>
+    <tr><td>Next Guidance / <span class="term" data-term="consensus">Consensus</span></td><td>市場原本期待下一步多好？</td><td>Q3 Revenue midpoint $3.15B；Non-GAAP EPS $1.10</td></tr>
+  </table>
+  <p>所以「beat」只能回答：公司有沒有超過某個基準。它沒有回答：<b>beat 得夠不夠多？未來展望是否高過市場偷偷期待的 whisper number？估值是不是已經要求更高的成長？</b></p>
+  <details><summary>為什麼財報好，股票還是可能跌？</summary>
+    <p>例如市場原本在股價裡預期下一年成長 50%，但公司正式指引只有 35%。即使這一季營收與 EPS 都 beat，投資人仍可能下修未來估值。這不是矛盾，而是「過去成績」與「未來預期」兩個不同問題。</p>
+  </details>
+  <label class="checkrow"><input type="checkbox" class="learn" data-key="guidance"> 我知道財報不是只看 beat / miss，而要把 Actual、舊 Guidance、下一季 Guidance、Consensus 分開。</label>
+</section>
+
+<section id="judge">
+  <div class="kicker">06 · 一季到底好不好？</div>
+  <h2>使用「三層判斷法」，不要只憑感覺</h2>
+  <div class="grid3">
+    <div class="card"><span class="tag fact">第一層：事實</span><h3>數字到底發生什麼？</h3><p>Revenue、YoY、QoQ、GM、Operating Margin、EPS、Cash Flow、Guidance。</p></div>
+    <div class="card"><span class="tag infer">第二層：推論</span><h3>這些數字可能代表什麼？</h3><p>需求強、產品組合變好、規模經濟出現，或反過來成本壓力變大。</p></div>
+    <div class="card"><span class="tag unknown">第三層：未知</span><h3>哪些問題現在根本還沒有答案？</h3><p>客戶量產時程、custom silicon 獲利率、未來訂單能見度、估值已反映多少。</p></div>
+  </div>
+
+  <h3 style="margin-top:24px">MRVL 這一季練習版</h3>
+  <table>
+    <tr><th>問題</th><th>目前判斷</th></tr>
+    <tr><td>營收有成長嗎？</td><td class="good">是。YoY +37%，QoQ 約 +13.3%。</td></tr>
+    <tr><td>毛利率有改善嗎？</td><td class="good">GAAP GM 53.1%，去年同期 50.4%。</td></tr>
+    <tr><td>現金流是正的嗎？</td><td class="good">是，Operating Cash Flow $605.5M。</td></tr>
+    <tr><td>管理層看下一季更差嗎？</td><td class="good">目前不是。Q3 revenue midpoint $3.15B，高於 Q2 actual。</td></tr>
+    <tr><td>所以股票一定便宜嗎？</td><td class="bad">不能推出。還要知道未來 EPS、估值倍數、風險與市場已定價程度。</td></tr>
+  </table>
+  <label class="checkrow"><input type="checkbox" class="learn" data-key="judge"> 我能把「公司營運變好」與「股票值得買」分成兩個問題。</label>
+</section>
+
+<section>
+  <div class="kicker">07 · 與你的持倉連結</div>
+  <h2>不要讓「成本價」偷偷變成財報指標</h2>
+  <div class="card">
+    <p>持股數量、買入成本與可投入資金，對<b>部位管理</b>很重要，但不是判斷「MRVL 這一季財報好不好」的財務指標。請先閱讀公司財報，再依自己的風險承受能力評估部位。</p>
+    <p><b>財報應該先問：</b>公司正在變好還是變差？原本投資假設有沒有被驗證？<br>
+    <b>最後才問：</b>以目前價格、你的部位大小與風險承受能力，是否值得增加曝險？</p>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card"><h3>錯誤順序</h3><p class="bad">股價跌很多 → 我的均價很高 → 想攤平 → 找財報中的好消息支持加碼。</p></div>
+    <div class="card"><h3>正確順序</h3><p class="good">重新讀財報 → 更新投資假設 → 建 <span class="term" data-term="bull_base_bear">Bull / Base / Bear</span> → 更新<span class="term" data-term="valuation_range">合理價值區間</span> → 最後才做部位決策。</p></div>
+  </div>
+  <label class="checkrow"><input type="checkbox" class="learn" data-key="position"> 我知道成本價是我的歷史，不是公司的基本面。</label>
+</section>
+
+<section id="quiz">
+  <div class="kicker">08 · 小測驗</div>
+  <h2>不用背，目標是確認你真的理解</h2>
+  <div class="quiz">
+    <div id="q1">
+      <h3>Q1. MRVL Q2 Revenue YoY +37%，最直接能證明什麼？</h3>
+      <label class="option"><input type="radio" name="q1" value="a"> 股票被低估 37%</label>
+      <label class="option"><input type="radio" name="q1" value="b"> 本季營收比去年同季高 37%</label>
+      <label class="option"><input type="radio" name="q1" value="c"> 下一季 EPS 一定成長 37%</label>
+    </div>
+    <hr>
+    <div id="q2">
+      <h3>Q2. Non-GAAP EPS 比 GAAP EPS 高很多時，最佳反應是？</h3>
+      <label class="option"><input type="radio" name="q2" value="a"> 只看比較高的 Non-GAAP</label>
+      <label class="option"><input type="radio" name="q2" value="b"> 只看 GAAP，Non-GAAP 全部沒用</label>
+      <label class="option"><input type="radio" name="q2" value="c"> 看差異是由哪些調整項目造成，以及那些成本會不會反覆發生</label>
+    </div>
+    <hr>
+    <div id="q3">
+      <h3>Q3. 財報 beat 但股價跌，哪個解釋最嚴謹？</h3>
+      <label class="option"><input type="radio" name="q3" value="a"> 市場一定錯殺</label>
+      <label class="option"><input type="radio" name="q3" value="b"> 公司一定有內幕壞消息</label>
+      <label class="option"><input type="radio" name="q3" value="c"> 需要檢查未來 Guidance、Consensus、估值與尚未確認的資訊，不能只靠 beat 判斷</label>
+    </div>
+    <button onclick="gradeQuiz()">批改</button>
+    <p id="quizResult" style="font-weight:900"></p>
+  </div>
+  <label class="checkrow"><input type="checkbox" class="learn" data-key="quiz"> 我已完成小測驗並理解錯題。</label>
+</section>
+
+<section id="worksheet">
+  <div class="kicker">09 · 你的 MRVL 財報作業單</div>
+  <h2>下一次財報公布時，直接打開這頁填</h2>
+  <div class="worksheet">
+    <div class="grid2">
+      <div><label>季度</label><input id="quarter" type="text" placeholder="例如 FY2027 Q3"></div>
+      <div><label>財報日期</label><input id="date" type="text" placeholder="YYYY-MM-DD"></div>
+      <div><label>Revenue Actual</label><input id="rev" type="text" placeholder="$...B"></div>
+      <div><label>Revenue YoY / QoQ</label><input id="growth" type="text" placeholder="+...% / +...%"></div>
+      <div><label>GAAP / Non-GAAP Gross Margin</label><input id="gm" type="text" placeholder="...% / ...%"></div>
+      <div><label>GAAP / Non-GAAP EPS</label><input id="eps" type="text" placeholder="$... / $..."></div>
+      <div><label>Operating Cash Flow</label><input id="ocf" type="text" placeholder="$...M"></div>
+      <div><label>下一季 Revenue / EPS Guidance</label><input id="guide" type="text" placeholder="..."></div>
+    </div>
+    <label>① 三個最重要的「事實」</label>
+    <textarea id="facts" placeholder="只寫公司正式公布、可驗證的內容。"></textarea>
+    <label>② 我的「推論」</label>
+    <textarea id="infers" placeholder="這些數字可能代表需求、產品組合、競爭力或成本發生什麼變化？"></textarea>
+    <label>③ 現在仍然不知道的「未知數」</label>
+    <textarea id="unknowns" placeholder="哪些問題下一季才有答案？哪些地方管理層沒有給足資訊？"></textarea>
+    <label>④ 如果我是空頭，我會提出哪三個最強理由？</label>
+    <textarea id="bear" placeholder="不要寫弱反方。寫出真的會讓你不舒服的 Bear Case。"></textarea>
+    <label>⑤ 這一季對我原本投資假設的影響</label>
+    <select id="impact">
+      <option value="">請選擇</option>
+      <option>明顯強化</option><option>小幅強化</option><option>大致不變</option><option>小幅削弱</option><option>明顯破壞</option>
+    </select>
+    <label>⑥ 我下一季最需要驗證的唯一一件事</label>
+    <textarea id="next" placeholder="只選一件最關鍵的。"></textarea>
+    <button onclick="saveWorksheet()">儲存作業單</button>
+    <button onclick="window.print()" style="margin-left:8px;background:#334155">列印 / 存成 PDF</button>
+    <p id="saveStatus" class="muted"></p>
+  </div>
+</section>
+
+
+<section id="glossary-index">
+  <div class="kicker">名詞索引 · 隨時回來查</div>
+  <h2>最常出現的 18 個財報詞</h2>
+  <div class="glossary-grid">
+    <div class="glossary-card"><small>文件</small><h3><span class="term" data-term="earnings_release">Earnings Release</span></h3><p>公司快速公布本季成績與展望的摘要。</p></div>
+    <div class="glossary-card"><small>文件</small><h3><span class="term" data-term="income_statement">Income Statement</span></h3><p>看一段期間內營收、成本與獲利。</p></div>
+    <div class="glossary-card"><small>文件</small><h3><span class="term" data-term="balance_sheet">Balance Sheet</span></h3><p>看某一天公司擁有什麼、欠什麼。</p></div>
+    <div class="glossary-card"><small>成長</small><h3><span class="term" data-term="revenue">Revenue</span></h3><p>公司賣產品或服務收到的營業收入。</p></div>
+    <div class="glossary-card"><small>成長</small><h3><span class="term" data-term="yoy">YoY</span></h3><p>跟去年同一季相比，適合看長期成長。</p></div>
+    <div class="glossary-card"><small>成長</small><h3><span class="term" data-term="qoq">QoQ</span></h3><p>跟上一季相比，適合看短期加速或減速。</p></div>
+    <div class="glossary-card"><small>獲利</small><h3><span class="term" data-term="gross_margin">Gross Margin</span></h3><p>扣掉產品直接成本後，每 100 元營收還剩多少。</p></div>
+    <div class="glossary-card"><small>獲利</small><h3><span class="term" data-term="operating_margin">Operating Margin</span></h3><p>再扣掉研發與行政等營運費用後，本業剩多少。</p></div>
+    <div class="glossary-card"><small>每股</small><h3><span class="term" data-term="eps">EPS</span></h3><p>公司獲利分攤到每一股是多少。</p></div>
+    <div class="glossary-card"><small>現金</small><h3><span class="term" data-term="operating_cash_flow">Operating Cash Flow</span></h3><p>本業真正產生多少現金。</p></div>
+    <div class="glossary-card"><small>未來</small><h3><span class="term" data-term="guidance">Guidance</span></h3><p>管理層對下一季或下一年度的預測。</p></div>
+    <div class="glossary-card"><small>市場</small><h3><span class="term" data-term="consensus">Consensus</span></h3><p>分析師預測的平均或中位數，市場常拿來當比較基準。</p></div>
+    <div class="glossary-card"><small>會計</small><h3><span class="term" data-term="gaap">GAAP</span></h3><p>依正式會計準則計算的數字。</p></div>
+    <div class="glossary-card"><small>會計</small><h3><span class="term" data-term="non_gaap">Non-GAAP</span></h3><p>公司排除部分項目後呈現的調整後數字。</p></div>
+    <div class="glossary-card"><small>費用</small><h3><span class="term" data-term="rd">R&amp;D</span></h3><p>Research & Development，研究與開發費用。</p></div>
+    <div class="glossary-card"><small>費用</small><h3><span class="term" data-term="sga">SG&amp;A</span></h3><p>銷售、一般與行政費用。</p></div>
+    <div class="glossary-card"><small>市場反應</small><h3><span class="term" data-term="beat_miss">Beat / Miss</span></h3><p>實際數字高於或低於市場／公司原先預期。</p></div>
+    <div class="glossary-card"><small>估值</small><h3><span class="term" data-term="valuation">Valuation</span></h3><p>市場現在願意為公司的未來獲利付多少價格。</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="kicker">10 · 來源與資料品質</div>
+  <h2>這一版教材用了哪些資料？</h2>
+  <div class="card">
+    <p><b>主要來源：</b>Marvell 官方 Investor Relations FY2027 Q2 8-K / Earnings Release、FY2027 Q2 Form 10-Q，以及 FY2027 Q1 Earnings Release。v1.2 已將 FY2027 Q2 三大正式報表的主要科目與官方數值加入「官方財報閱讀室」。</p>
+    <p class="source">
+      官方 Q2 Earnings Release：
+      <a href="https://investor.marvell.com/news-events/press-releases/detail/1031/marvell-technology-inc-reports-second-quarter-of-fiscal-year-2027-financial-results" target="_blank">Marvell IR</a><br>
+      官方 Q2 10-Q：
+      <a href="https://investor.marvell.com/sec-filings/all-sec-filings/content/0001835632-26-000025/mrvl-20260801.htm" target="_blank">Marvell 10-Q</a><br>
+      官方 Financial Results：
+      <a href="https://investor.marvell.com/financial-information/financial-results" target="_blank">Marvell Financial Results</a>
+    </p>
+    <p><b>Currency：</b>資料更新至 2026-09-07，可涵蓋 2026-08-27 發布的最新 FY2027 Q2 財報。</p>
+    <p><b>Authority：</b>財務數字以公司 IR 與 SEC 申報文件為主。這些來源最適合確認公司正式公布數字，但公司對未來的 Guidance 仍屬管理層預測，不等於已實現結果。</p>
+    <p><b>仍有不確定性：</b>市場 Consensus、財報前後估值倍數、機構資金流、custom silicon 各客戶專案的完整拆分，不在公司財報中完整披露，因此不應用猜測補上。</p>
+  </div>
+</section>
+
+</div>
+
+
+<div class="modal-backdrop" id="termModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div><div class="kicker">財報名詞白話解釋</div><h3 id="termTitle"></h3></div>
+      <button class="modal-close" onclick="closeTerm()">✕</button>
+    </div>
+    <div class="modal-section"><div class="modal-label">一句話先懂</div><p id="termPlain"></p></div>
+    <div class="modal-section"><div class="modal-label">為什麼投資人要看</div><p id="termWhy"></p></div>
+    <div class="modal-section"><div class="modal-label">放回 MRVL 怎麼看</div><div class="term-example" id="termMrvl"></div></div>
+    <div class="modal-section"><div class="modal-label">新手最容易誤判</div><p id="termTrap"></p></div>
+  </div>
+</div>
+
+<script>
+const glossary = {"earnings_release": {"title": "Earnings Release｜財報新聞稿", "plain": "公司在財報日先發布的「快速版成績單」。通常幾頁就能看到營收、EPS、毛利率、管理層重點與下一季 Guidance。", "why": "它讓你在最短時間內知道這一季大方向，但細節比 10-Q 少。", "mrvl": "看 MRVL 時，你可以先用 Earnings Release 抓 Revenue、Gross Margin、EPS、Data Center 成長與下一季 Guidance，再進 10-Q 查細節。", "trap": "不要把公司新聞稿當成完整研究。它是公司自己選擇呈現重點的文件，目的也包含對投資人溝通。"}, "income_statement": {"title": "Income Statement｜損益表", "plain": "把一段期間內「賣多少、花多少、最後賺多少」排成一張表。", "why": "它是判斷公司成長與獲利能力的核心。", "mrvl": "先找 Revenue，再一路往下看 Cost of Goods Sold、Gross Profit、R&D、SG&A、Operating Income、Net Income。", "trap": "營收增加不代表獲利一定增加。若成本或費用漲得更快，最後 EPS 仍可能變差。"}, "balance_sheet": {"title": "Balance Sheet｜資產負債表", "plain": "某一天公司的財務快照。左邊是資產，右邊是負債與股東權益。", "why": "可以看現金、存貨、應收帳款、借款，以及公司財務結構是否健康。", "mrvl": "MRVL 是半導體公司，可留意 Cash、Inventory、Goodwill / Intangibles、Debt 等項目。", "trap": "它是某一個時間點，不是整季的流量。不能把 Balance Sheet 與 Income Statement 當成同一種東西。"}, "cash_flow_statement": {"title": "Cash Flow Statement｜現金流量表", "plain": "追蹤現金到底從哪裡進來、往哪裡出去。", "why": "公司帳面上可以有獲利，但現金不一定同步增加。現金流能幫你驗證獲利品質。", "mrvl": "先看 Operating Cash Flow，再看資本支出、併購與融資活動。", "trap": "Operating Cash Flow 不是 Free Cash Flow。後者通常還要再扣資本支出。"}, "ten_q": {"title": "10-Q｜季度正式申報文件", "plain": "美國上市公司向 SEC 提交的季度正式財務文件。", "why": "比 Earnings Release 詳細很多，包含完整三大財務報表、註解、風險與管理層討論。", "mrvl": "當 Earnings Release 出現你不懂或想驗證的地方，再進 MRVL 10-Q 查原始數字與註腳。", "trap": "新手不需要第一次就從第一頁啃到最後。先知道自己要找什麼。"}, "ten_k": {"title": "10-K｜年度正式申報文件", "plain": "美國上市公司的年度完整版財務報告。", "why": "比 10-Q 更完整，會整理整年度營運、風險、業務模式與會計資料。", "mrvl": "想真正理解 MRVL 的產品、客戶集中、併購、長期風險時，10-K 很重要。", "trap": "篇幅很長。把它當參考資料庫，而不是一次讀完的課本。"}, "revenue": {"title": "Revenue｜營收", "plain": "公司把產品或服務賣出去，會計上認列的收入。它回答：「公司這一季做了多少生意？」", "why": "Revenue 是成長的起點，但不是獲利。", "mrvl": "MRVL FY2027 Q2 Revenue 約 27.39 億美元，YoY +37%。這證明本季生意規模比去年同季更大。", "trap": "Revenue +37% 不等於 EPS +37%，更不等於股價應該 +37%。"}, "yoy": {"title": "YoY｜Year over Year，年增率", "plain": "拿這一季跟「去年同一季」相比。", "why": "可以避開部分季節性，適合看公司一年尺度的成長。", "mrvl": "MRVL Q2 Revenue YoY +37%，代表比去年同一季度高 37%。", "trap": "YoY 很高有時也可能因為去年基期很低，所以仍要配合絕對金額與多季趨勢。"}, "qoq": {"title": "QoQ｜Quarter over Quarter，季增率", "plain": "拿這一季跟「上一季」相比。", "why": "很適合觀察最近正在加速還是減速。", "mrvl": "MRVL Q1 Revenue 約 24.18 億美元，Q2 約 27.39 億美元，所以 QoQ 約 +13.3%。", "trap": "單一季 QoQ 可能受季節性、交貨跨季影響，不一定代表長期趨勢。"}, "gross_margin": {"title": "Gross Margin｜毛利率", "plain": "Revenue 扣掉直接產品成本後，剩下多少比例。", "why": "它反映產品定價能力、產品組合與直接成本。", "mrvl": "假設毛利率 53.1%，可以白話理解為每 100 美元營收，在扣掉直接成本後約剩 53.1 美元。", "trap": "毛利不是淨利。後面還要扣 R&D、SG&A、利息與稅。"}, "gaap_gross_margin": {"title": "GAAP Gross Margin｜GAAP 毛利率", "plain": "依正式會計準則計算的毛利率，包含 GAAP 要求納入的相關成本。", "why": "比較完整反映會計成本，也較方便跨期一致比較。", "mrvl": "MRVL FY2027 Q2 GAAP Gross Margin 為 53.1%。", "trap": "不要直接拿 GAAP GM 與另一家公司 Non-GAAP GM 比。口徑不同。"}, "non_gaap_gross_margin": {"title": "Non-GAAP Gross Margin｜調整後毛利率", "plain": "公司排除某些會計項目後算出的毛利率。", "why": "可以幫助觀察公司認為的「核心營運」表現。", "mrvl": "MRVL FY2027 Q2 Non-GAAP GM 為 58.9%，高於 GAAP GM。", "trap": "數字漂亮不等於比較真。先看公司到底排除了哪些成本。"}, "operating_margin": {"title": "Operating Margin｜營業利益率", "plain": "毛利再扣掉研發、銷售、行政等營運費用後，還剩多少比例。", "why": "比 Gross Margin 更接近公司本業真正賺錢的能力。", "mrvl": "半導體公司 R&D 很大，所以 MRVL 的營業利益率能否隨營收擴張而改善，是重要觀察點。", "trap": "營業利益仍不是最後淨利，之後還可能有利息、其他收入與稅。"}, "eps": {"title": "EPS｜Earnings Per Share，每股盈餘", "plain": "公司最後的獲利，平均分到每一股是多少。", "why": "你持有的是「股」，所以 EPS 比單看總淨利更貼近股東價值。", "mrvl": "MRVL Q2 GAAP EPS $0.33，Non-GAAP EPS $0.94。", "trap": "EPS 也會受到股數改變影響。公司若大量發股，總獲利成長但每股獲利未必同步。"}, "gaap_eps": {"title": "GAAP EPS｜GAAP 每股盈餘", "plain": "依正式會計準則計算的每股盈餘。", "why": "完整納入會計準則要求的費用與收益。", "mrvl": "MRVL FY2027 Q2 GAAP EPS 為 $0.33。", "trap": "與 Non-GAAP EPS 差很大時，正確問題是「差在哪些調整項目？」"}, "non_gaap_eps": {"title": "Non-GAAP EPS｜調整後每股盈餘", "plain": "排除公司認為不反映核心營運的部分項目後計算。", "why": "華爾街常用它比較營運趨勢與 Consensus。", "mrvl": "MRVL FY2027 Q2 Non-GAAP EPS 為 $0.94。", "trap": "被排除的項目若年年都發生，就不能因為叫做 Non-GAAP 就當成不存在。"}, "operating_cash_flow": {"title": "Operating Cash Flow｜營業現金流", "plain": "公司本業在這段期間真正帶進多少現金。", "why": "可以幫助檢查帳面獲利是否有轉化成現金。", "mrvl": "MRVL FY2027 Q2 Operating Cash Flow 約 6.055 億美元。", "trap": "正的 Operating Cash Flow 很好，但仍要看資本支出、債務與其他現金用途。"}, "cash_flow": {"title": "Cash Flow｜現金流", "plain": "現金實際進出公司的流量。", "why": "會計獲利與現金是兩件不同的事。", "mrvl": "學 MRVL 時，先抓 Operating Cash Flow，再進階學 Free Cash Flow。", "trap": "不要只因 Net Income 為正就假定公司現金一定增加。"}, "guidance": {"title": "Guidance｜公司財測 / 展望", "plain": "管理層對下一季或下一年度營收、EPS、毛利率等做出的預測。", "why": "市場交易的是未來，所以 Guidance 常比上一季 Actual 更能影響股價。", "mrvl": "MRVL Q3 Revenue Guidance 中位數為 31.5 億美元。", "trap": "Guidance 是管理層估計，不是已經發生的事，也不是保證。"}, "revenue_guidance": {"title": "Revenue Guidance｜營收財測", "plain": "公司預估下一季或未來某期間營收大約會是多少。", "why": "可以直接看管理層預期公司生意規模下一步是擴大還是縮小。", "mrvl": "MRVL Q3 Revenue Guidance 中位數 31.5 億美元，高於 Q2 Actual 27.39 億美元。", "trap": "市場可能早就期待更高，所以 Guidance 成長並不保證股價上漲。"}, "gaap": {"title": "GAAP｜Generally Accepted Accounting Principles", "plain": "美國一般公認會計原則。可以把它理解成上市公司做正式財報時要遵守的一套會計規則。", "why": "讓公司不能完全自由選擇怎麼算獲利。", "mrvl": "看 MRVL 時，GAAP 數字是你的正式會計基準。", "trap": "GAAP 也不是「公司真正價值」的同義詞，它只是會計口徑。"}, "non_gaap": {"title": "Non-GAAP｜非 GAAP / 調整後數字", "plain": "公司把部分項目加回或排除後，另外呈現的經營數字。", "why": "有時更適合觀察核心營運趨勢。", "mrvl": "MRVL 同時公布 GAAP 與 Non-GAAP Gross Margin、EPS 等指標。", "trap": "不要因為 Non-GAAP 數字比較好看就只看它。"}, "actual": {"title": "Actual｜實際值", "plain": "公司這一季最後真的做出來的數字。", "why": "拿它跟上一期 Guidance 或市場 Consensus 比，才能知道公司是超出、符合還是低於預期。", "mrvl": "例如 Q2 Revenue $2.739B 是 Actual。", "trap": "Actual 很好，只代表過去這一季，不能自動延伸成未來。"}, "previous_guidance": {"title": "Previous Guidance｜上一期公司財測", "plain": "公司在上一季財報時，對這一季曾經給出的預測。", "why": "可以檢查管理層是否做到自己先前說過的目標。", "mrvl": "把 Q2 Actual 跟公司之前給的 Q2 Guidance 比，比單看新聞標題更有意義。", "trap": "不要只拿 Actual 跟去年比，而忘記市場其實在意『有沒有超過原本期待』。"}, "consensus": {"title": "Consensus｜市場共識預估", "plain": "多位分析師對 Revenue、EPS 等預測彙整後的平均或中位數。", "why": "財報日的 Beat / Miss 通常就是跟這個市場基準比較。", "mrvl": "若 MRVL EPS 高於公司 Guidance 但低於市場 Consensus，股價仍可能承壓。", "trap": "Consensus 不是市場所有人的真正期待。還可能存在更高的 whisper number。"}, "rd": {"title": "R&D｜Research & Development，研發費用", "plain": "公司投入新產品、晶片設計、技術開發的人事與其他支出。", "why": "半導體公司競爭力很大部分來自研發，但研發也是非常大的費用。", "mrvl": "看 MRVL 時，Revenue 成長同時要看 R&D 是否合理成長，以及能否帶來新產品與客戶。", "trap": "R&D 高不一定壞，太低也不一定好。要問投入有沒有轉化成產品與收入。"}, "sga": {"title": "SG&A｜Selling, General & Administrative", "plain": "銷售、一般與行政費用，包括業務、人資、行政、法務等成本。", "why": "可看公司管理與銷售體系是否隨規模變得更有效率。", "mrvl": "營收快速成長時，如果 SG&A 成長慢於營收，常能帶來營運槓桿。", "trap": "單純砍 SG&A 可能短期讓利潤變好，但也可能犧牲長期業務能力。"}, "beat_miss": {"title": "Beat / Miss｜優於 / 低於預期", "plain": "Beat 表示實際數字高於比較基準；Miss 表示低於。", "why": "財報日股價常對『跟預期差多少』反應，而不是只對絕對數字反應。", "mrvl": "即使 MRVL Revenue 與 EPS 都 Beat，如果下一季 Guidance 低於市場更高期待，股價仍可能跌。", "trap": "Beat 不等於財報一定好；Miss 也不等於整個投資假設一定壞。"}, "valuation": {"title": "Valuation｜估值", "plain": "市場願意為公司未來獲利、現金流與成長支付多少價格。", "why": "好公司也可能因為價格太貴而不是好投資；普通公司也可能因低估而有報酬。", "mrvl": "你最後需要把 MRVL 的 EPS 成長與市場願意給的估值倍數放在一起看。", "trap": "營運成長與股票便宜是兩個不同問題。"}, "bull_base_bear": {"title": "Bull / Base / Bear Case｜樂觀 / 基準 / 悲觀情境", "plain": "不是猜一個唯一未來，而是同時建立三個可能世界。", "why": "幫你把不確定性放進決策，不會只剩『我看多所以一定漲』。", "mrvl": "例如可以分別假設 custom silicon 專案提前、如期、延後，並觀察 Revenue、EPS 與估值可能如何變。", "trap": "Bear Case 不是故意寫一個很蠢的反方再把它打倒。要寫最有威脅性的版本。"}, "valuation_range": {"title": "合理價值區間｜Valuation Range", "plain": "用一個範圍表示公司可能值多少，而不是假裝可以算出精準單點。", "why": "當未來不確定性很高時，區間比單一目標價更誠實。", "mrvl": "若 custom silicon 的收入時程與利潤率仍有大未知，MRVL 的合理價值區間本來就應該比較寬。", "trap": "成本價不是合理價值。市場也沒有義務讓股價回到你的買入價。"}, "cogs": {"title": "Cost of Goods Sold (COGS)｜銷貨成本 / 直接成本", "plain": "為了做出並交付產品，直接發生的成本。", "why": "Revenue 減掉 COGS 就得到 Gross Profit，所以它直接影響毛利率。", "mrvl": "MRVL FY2027 Q2 Revenue 2,739.3M、COGS 1,283.7M，因此 Gross Profit 1,455.6M。", "trap": "COGS 不包含所有公司費用。R&D、SG&A 等會在後面另外扣。"}, "gross_profit": {"title": "Gross Profit｜毛利", "plain": "Revenue 減掉 Cost of Goods Sold 後剩下的金額。", "why": "看產品本身賺錢能力的第一層。", "mrvl": "MRVL Q2 Gross Profit 1,455.6M，對 Revenue 2,739.3M 約等於 53.1% GAAP Gross Margin。", "trap": "Gross Profit 是金額；Gross Margin 是百分比。"}, "operating_income": {"title": "Operating Income｜營業利益", "plain": "Gross Profit 再扣掉 R&D、SG&A 等營運費用後，本業剩下的獲利。", "why": "比毛利更接近公司核心營運真正留下的錢。", "mrvl": "MRVL FY2027 Q2 GAAP Operating Income 為 459.7M。", "trap": "Operating Income 還不是 Net Income，之後還有利息、其他損益與所得稅。"}, "net_income": {"title": "Net Income｜淨利", "plain": "營運費用、利息、其他損益與稅都算完後，公司最後留下的 GAAP 獲利。", "why": "EPS 的分子主要就是 Net Income。", "mrvl": "MRVL FY2027 Q2 GAAP Net Income 為 308.0M。", "trap": "淨利不是現金流，要再用 Cash Flow Statement 驗證。"}, "diluted_shares": {"title": "Diluted Weighted-average Shares｜稀釋後加權平均股數", "plain": "假設可能轉成普通股的工具也計入後，用來算 diluted EPS 的平均股數。", "why": "股數增加會稀釋每股獲利。", "mrvl": "MRVL FY2027 Q2 diluted shares 約 921.2M，高於去年同期 870.4M。", "trap": "公司總獲利成長，不代表 EPS 一定同幅成長。"}, "cash": {"title": "Cash and Cash Equivalents｜現金及約當現金", "plain": "公司手上最接近現金、能快速動用的資金。", "why": "判斷流動性、還債能力與投資能力的重要起點。", "mrvl": "MRVL 2026-08-01 Cash 為 3,932.8M。", "trap": "現金增加也可能來自借款或融資，不一定全是營運賺來的。"}, "accounts_receivable": {"title": "Accounts Receivable｜應收帳款", "plain": "公司已認列成 Revenue，但客戶還沒實際付進來的錢。", "why": "可用來檢查成長的收款品質。", "mrvl": "MRVL 2026-08-01 Accounts Receivable 為 2,218.4M。", "trap": "成長公司應收帳款增加很常見，要跟 Revenue 成長與周轉一起看。"}, "inventory": {"title": "Inventory｜存貨", "plain": "公司已準備、正在製作或等待出售的產品與材料。", "why": "能提供需求、備貨與供應鏈變化的線索。", "mrvl": "MRVL 2026-08-01 Inventory 為 1,360.6M，較年初 1,388.0M 略低。", "trap": "存貨增加可能是成長備貨，也可能是賣不出去。"}, "goodwill": {"title": "Goodwill｜商譽", "plain": "併購時，收購價格超過可辨認淨資產價值的部分。", "why": "Goodwill 很大常表示公司有大量併購歷史，也有未來減損風險。", "mrvl": "MRVL 2026-08-01 Goodwill 約 13,873.9M。", "trap": "Goodwill 不是能直接拿來還債的現金。"}, "long_term_debt": {"title": "Long-term Debt｜長期借款", "plain": "通常指一年以後才到期的借款。", "why": "會產生利息，也影響公司未來資金彈性。", "mrvl": "MRVL 2026-08-01 Long-term Debt 約 4,962.9M。", "trap": "債務要跟 Cash、Cash Flow、利率與資金用途一起看。"}, "stock_comp": {"title": "Stock-based Compensation｜股票薪酬", "plain": "公司用股票或股票相關獎酬支付員工。", "why": "它不一定造成當期現金流出，但可能稀釋股東，也是 GAAP / Non-GAAP 差異的重要來源。", "mrvl": "MRVL FY2027 Q2 Cash Flow Statement 中 Stock-based Compensation 為 326.2M。", "trap": "因為不是現金就把它當零成本，是常見錯誤。"}, "capex": {"title": "CapEx｜Capital Expenditures，資本支出", "plain": "公司購買長期使用的設備、廠房等資產所花的錢。", "why": "Operating Cash Flow 扣除 CapEx 常被用來粗略理解 Free Cash Flow。", "mrvl": "MRVL FY2027 Q2 Purchases of property and equipment 為 126.7M 現金流出。", "trap": "不同公司對 CapEx 的分類與資本需求不同，不能只用單一季度下結論。"}};
+
+
+function openTerm(key){
+  const d=glossary[key]; if(!d)return;
+  document.getElementById('termTitle').textContent=d.title;
+  document.getElementById('termPlain').textContent=d.plain;
+  document.getElementById('termWhy').textContent=d.why;
+  document.getElementById('termMrvl').textContent=d.mrvl;
+  document.getElementById('termTrap').textContent=d.trap;
+  const m=document.getElementById('termModal');
+  m.classList.add('show'); m.setAttribute('aria-hidden','false');
+}
+function closeTerm(){
+  const m=document.getElementById('termModal');
+  m.classList.remove('show'); m.setAttribute('aria-hidden','true');
+}
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-term]');
+  if(el){ e.preventDefault(); openTerm(el.dataset.term); }
+  if(e.target.id==='termModal') closeTerm();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTerm();});
+
+
+document.querySelectorAll('.statement-tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.statement-tab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.statement-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel=document.getElementById('panel-'+btn.dataset.panel);
+    if(panel)panel.classList.add('active');
+  });
+});
+function toggleStatementNotes(){
+  document.body.classList.toggle('clean-statements');
+  const clean=document.body.classList.contains('clean-statements');
+  const b=document.getElementById('annotationToggle');
+  if(b)b.textContent=clean?'教學標註：OFF':'教學標註：ON';
+  localStorage.setItem('mrvl_statement_clean',clean?'1':'0');
+}
+if(localStorage.getItem('mrvl_statement_clean')==='1'){
+  document.body.classList.add('clean-statements');
+  const b=document.getElementById('annotationToggle'); if(b)b.textContent='教學標註：OFF';
+}
+
+
+const stockLabData = {"MRVL": {"name": "Marvell Technology · MRVL", "quarter": "FY2027 Q2 · 截至 2026-08-01", "theme": "學習主題：Custom Silicon、資料中心、GAAP / Non-GAAP 與專案交付", "chips": ["Revenue +37% YoY", "Data Center +46% YoY", "GAAP GM 53.1%", "GAAP EPS $0.33"], "lesson": "MRVL 最適合拿來學「公司營運成長」和「投資假設是否真的被驗證」之間的差別。它的成長故事高度依賴 custom silicon 與資料中心專案，真正要追的是專案何時量產、收入何時認列、最後轉成多少每股獲利與現金流。", "focusTitle": "Revenue → Margin → EPS → 專案交付", "focusText": "先確認本季營收與獲利真的成長，再追下一季 Guidance 與 custom silicon 量產時程。", "caution": "MRVL 的風險不是只有「AI 需求會不會消失」，還包括專案時程、客戶集中、收入品質與估值已經反映多少。", "metrics": [["Revenue", "$2.739B", "YoY +37%"], ["GAAP GM", "53.1%", "去年同期 50.4%"], ["GAAP EPS", "$0.33", "Non-GAAP $0.94"], ["Operating Cash Flow", "$0.606B", "本季"]], "pnl": [["Net revenue", "2.739", "2.006"], ["Gross profit", "1.456", "1.011"], ["R&D", "0.741", "0.519"], ["Operating income", "0.460", "0.290"], ["Net income", "0.308", "0.195"], ["Diluted EPS", "$0.33", "$0.22"]], "breakdown": [["Data Center", "核心成長引擎，Q2 年增 46%。"], ["Custom silicon", "重點不是新聞金額，而是量產與收入認列。"], ["GAAP vs Non-GAAP", "EPS 差距很大，要追調整項目與股票薪酬。"]], "factTitle": "營運有實質成長", "fact": "Revenue、Gross profit、Operating income 與現金流都提供已實現證據。", "inferTitle": "需求與專案正在放量", "infer": "合理，但仍需要用後續季度與客戶／產品進度持續驗證。", "unknownTitle": "成長能否變成每股價值", "unknown": "專案時程、毛利率、股數與估值仍是關鍵未知。", "links": [["官方 IR", "https://investor.marvell.com/news-events/press-releases/detail/1031/marvell-technology-inc-reports-second-quarter-of-fiscal-year-2027-financial-results"], ["官方 10-Q", "https://investor.marvell.com/sec-filings/all-sec-filings/content/0001835632-26-000025/mrvl-20260801.htm"]], "source": "來源：Marvell FY2027 Q2 官方 Earnings Release / 10-Q。"}, "AAPL": {"name": "Apple Inc. · AAPL", "quarter": "FY2026 Q3 · 截至 2026-06-27", "theme": "學習主題：產品＋服務、毛利結構、現金創造與回購", "chips": ["Revenue +16% YoY", "Gross Margin 50.1%", "EPS +29% YoY", "Services $30.739B"], "lesson": "Apple 很適合學「同一家公司內，不同業務的毛利率可以完全不同」。Q3 Services 毛利率 75.6%，Products 40.1%。因此只看總 Revenue，會漏掉產品組合如何改變公司獲利品質。", "focusTitle": "Products vs Services", "focusText": "先看 iPhone、Mac、iPad、Wearables、Services 的營收，再看 Products 與 Services 毛利率。這會讓你理解「收入組合」為什麼能改變整體 Gross Margin。", "caution": "本季 50.1% Gross Margin 約有 2 個百分點受 tariff refunds 有利影響，EPS 也約有 $0.11 的有利影響，所以不能把整個改善都當成可持續營運趨勢。", "metrics": [["Revenue", "$109.417B", "YoY +16%"], ["GAAP GM", "50.1%", "去年同期 46.5%"], ["GAAP EPS", "$2.02", "YoY +29%"], ["Net Income", "$29.789B", "本季"]], "pnl": [["Net sales", "109.417", "94.036"], ["Gross margin", "54.770", "43.718"], ["R&D", "11.729", "8.866"], ["Operating income", "35.695", "28.202"], ["Net income", "29.789", "23.434"], ["Diluted EPS", "$2.02", "$1.57"]], "breakdown": [["iPhone", "$54.252B，YoY +22%"], ["Services", "$30.739B，YoY +12%；毛利率 75.6%"], ["Products GM", "40.1%，和 Services 的獲利結構差異很大。"]], "factTitle": "收入與 EPS 創六月季新高", "fact": "Revenue $109.4B、YoY +16%；Diluted EPS $2.02、YoY +29%。", "inferTitle": "Services 提高獲利品質", "infer": "Services 的高毛利確實有結構性價值，但本季總毛利率也受到 tariff refunds 幫助。", "unknownTitle": "高毛利與成長能否持續", "unknown": "Services 成長、iPhone 週期、AI 功能變現、關稅與法規風險仍需後續驗證。", "links": [["Apple 官方財報", "https://www.apple.com/newsroom/2026/07/apple-reports-third-quarter-results/"], ["SEC 10-Q", "https://www.sec.gov/Archives/edgar/data/320193/000032019326000020/aapl-20260627.htm"]], "source": "來源：Apple 2026-07-30 官方 Q3 Results 與 FY2026 Q3 SEC 10-Q。"}, "NVDA": {"name": "NVIDIA Corporation · NVDA", "quarter": "FY2027 Q2 · 截至 2026-07-26", "theme": "學習主題：超高速成長、Data Center 集中、Operating Leverage", "chips": ["Revenue +106% YoY", "Data Center +117% YoY", "GAAP GM 75.0%", "GAAP EPS $2.46"], "lesson": "NVIDIA 是學「Operating Leverage」的極端教材。Revenue YoY +106%，Operating income YoY +124%。當收入增長快過部分營運費用，公司獲利可以比 Revenue 增長得更快。", "focusTitle": "Revenue 成長有沒有轉成更快的獲利成長？", "focusText": "先比較 Revenue、Gross Profit、Operating Expenses、Operating Income 的增速，再看 Data Center 佔比是否讓公司變得更集中。", "caution": "Data Center Revenue $89.0B，已占總 Revenue 約 92.5%。高集中帶來強大成長，也代表對 AI 基礎設施週期、供應與大型客戶資本支出高度敏感。", "metrics": [["Revenue", "$96.221B", "YoY +106% / QoQ +18%"], ["GAAP GM", "75.0%", "去年同期 72.4%"], ["GAAP EPS", "$2.46", "YoY +128%"], ["Operating Cash Flow", "$24.077B", "本季"]], "pnl": [["Revenue", "96.221", "46.743"], ["Gross profit", "72.142", "33.853"], ["R&D", "7.054", "4.291"], ["Operating income", "63.734", "28.440"], ["Net income", "59.688", "26.422"], ["Diluted EPS", "$2.46", "$1.08"]], "breakdown": [["Data Center", "$89.023B，YoY +117%"], ["Hyperscale", "$48.710B，AI 基礎設施核心。"], ["AI Clouds / Industrial / Enterprise", "$40.313B，顯示需求來源不只單一 hyperscaler。"]], "factTitle": "成長速度仍極高", "fact": "Revenue YoY +106%，Operating income YoY +124%，Data Center YoY +117%。", "inferTitle": "Operating leverage 非常強", "infer": "收入快速擴張時，Operating income 成長更快，顯示規模效應明顯。", "unknownTitle": "這種速度能維持多久", "unknown": "AI CAPEX、GPU 經濟壽命、競爭、供應限制與客戶集中是最重要未知。", "links": [["NVIDIA 官方財報", "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/default.aspx"], ["SEC 10-Q", "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"]], "source": "來源：NVIDIA 2026-08-26 FY2027 Q2 官方 Results 與 SEC 10-Q。"}, "AMD": {"name": "Advanced Micro Devices · AMD", "quarter": "Q2 2026 · 截至 2026-06-27", "theme": "學習主題：GAAP / Non-GAAP、Data Center、產品組合與一次性因素", "chips": ["Revenue +50% YoY", "Data Center +107% YoY", "GAAP GM 54%", "GAAP EPS $1.38"], "lesson": "AMD 很適合學「比較基期可能被特殊事件扭曲」。Q2 2025 曾包含 $800M 與 MI308 出口限制有關的 inventory / related charges，因此 Q2 2026 的毛利率與獲利 YoY 改善不能全部視為純粹的正常營運提升。", "focusTitle": "先問：去年基期正常嗎？", "focusText": "看 YoY 前先找註腳。若去年有一次性損失，今年看起來會特別漂亮。接著再看 Data Center、Client & Gaming、Embedded 三大業務。", "caution": "AMD Q2 2026 Revenue +50%，但 Data Center 已占約 58%。同時 export controls、MI 系列量產、客戶部署與 warrants 都可能影響未來解讀。", "metrics": [["Revenue", "$11.536B", "YoY +50% / QoQ +13%"], ["GAAP GM", "54%", "Non-GAAP 56%"], ["GAAP EPS", "$1.38", "Non-GAAP $1.66"], ["Operating Cash Flow", "$2.366B", "本季"]], "pnl": [["Net revenue", "11.536", "7.685"], ["Gross profit", "6.203", "3.059"], ["R&D", "2.528", "1.894"], ["Operating income", "1.990", "-0.134"], ["Net income", "2.297", "0.872"], ["Diluted EPS", "$1.38", "$0.54"]], "breakdown": [["Data Center", "$6.718B，YoY +107%"], ["Client & Gaming", "$3.841B，YoY +6%"], ["Embedded", "$0.977B，YoY +19%"]], "factTitle": "Data Center 正在高速擴張", "fact": "Data Center Revenue $6.718B，YoY +107%，是本季最強成長來源。", "inferTitle": "AI 業務正在改變公司結構", "infer": "合理，但要把去年 MI308 相關 charges 對比較基期的扭曲剝掉。", "unknownTitle": "AI 部署轉成多少持續獲利", "unknown": "Instinct 部署、出口限制、毛利率、warrant 稀釋與客戶採用仍需追蹤。", "links": [["AMD 官方財報", "https://ir.amd.com/news-events/press-releases/detail/1295/amd-reports-second-quarter-2026-financial-results"], ["SEC 10-Q", "https://www.sec.gov/Archives/edgar/data/2488/000000248826000123/amd-20260627.htm"]], "source": "來源：AMD 2026-08-04 Q2 Results 與 2026-08-05 SEC 10-Q。"}};
+
+function renderStockLab(ticker){
+  const d=stockLabData[ticker]; if(!d)return;
+  document.querySelectorAll('.stock-btn').forEach(b=>b.classList.toggle('active',b.dataset.stock===ticker));
+  document.getElementById('labQuarter').textContent=d.quarter;
+  document.getElementById('labName').textContent=d.name;
+  document.getElementById('labTheme').textContent=d.theme;
+  document.getElementById('labChips').innerHTML=d.chips.map(x=>`<span class="company-chip">${x}</span>`).join('');
+  document.getElementById('labLesson').textContent=d.lesson;
+  document.getElementById('labFocusTitle').textContent=d.focusTitle;
+  document.getElementById('labFocusText').textContent=d.focusText;
+  document.getElementById('labCaution').textContent=d.caution;
+
+  document.getElementById('labMetrics').innerHTML=d.metrics.map(m=>`
+    <div class="metric"><small>${m[0]}</small><strong>${m[1]}</strong><span class="muted">${m[2]}</span></div>
+  `).join('');
+
+  const tbody=document.querySelector('#labPnl tbody');
+  tbody.innerHTML=d.pnl.map((r,i)=>`
+    <tr class="${[0,1,3,4,5].includes(i)?'major':''}">
+      <td>${r[0]}</td><td class="numcell">${r[1]}</td><td class="numcell">${r[2]}</td>
+    </tr>`).join('');
+
+  document.getElementById('labBreakdown').innerHTML=d.breakdown.map(x=>`
+    <div class="reading-callout"><div class="icon">→</div><div><b>${x[0]}</b><br><span class="muted">${x[1]}</span></div></div>
+  `).join('');
+
+  document.getElementById('labFactTitle').textContent=d.factTitle;
+  document.getElementById('labFact').textContent=d.fact;
+  document.getElementById('labInferTitle').textContent=d.inferTitle;
+  document.getElementById('labInfer').textContent=d.infer;
+  document.getElementById('labUnknownTitle').textContent=d.unknownTitle;
+  document.getElementById('labUnknown').textContent=d.unknown;
+
+  document.getElementById('labLinks').innerHTML=d.links.map(x=>`<a class="linkbtn" target="_blank" href="${x[1]}">${x[0]} ↗</a>`).join('');
+  document.getElementById('labSourceNote').textContent=d.source;
+  localStorage.setItem('financial_academy_stock',ticker);
+}
+document.querySelectorAll('.stock-btn').forEach(b=>b.addEventListener('click',()=>renderStockLab(b.dataset.stock)));
+renderStockLab(localStorage.getItem('financial_academy_stock') || 'MRVL');
+
+
+
+const compareInterpret = {
+  MRVL:{
+    one:"Revenue、Gross Profit、Operating Income、Net Income 都比去年同期高。",
+    two:"但 Diluted Shares 也增加，代表每股價值要同時注意稀釋。",
+    three:"下一步不是只問『成長了嗎』，而是問 custom silicon 的成長能否持續轉成 EPS 與現金流。"
+  },
+  AAPL:{
+    one:"Revenue、Operating Income、Net Income 與 EPS 都高於去年同期。",
+    two:"但本季 Gross Margin 與 EPS 有 tariff refunds 的有利影響。",
+    three:"下一步要拆 Products / Services 結構，而不是只看總 Revenue。"
+  },
+  NVDA:{
+    one:"Revenue、Operating Income、Net Income 與 EPS 都呈現超高速成長。",
+    two:"Operating Income 成長速度高於 Revenue，顯示 Operating Leverage 很強。",
+    three:"下一步要問這種高成長與高毛利能維持多久，以及 Data Center 集中度帶來什麼風險。"
+  },
+  AMD:{
+    one:"Revenue、Operating Income、Net Income 與 EPS 都明顯優於去年同期。",
+    two:"但去年同期受到 MI308 export restriction charges 影響，基期並不完全正常。",
+    three:"下一步要把一次性基期效果剝掉，再看 Data Center、Client & Gaming、Embedded 的真正趨勢。"
+  }
+};
+
+function numClean(v){
+  if(v===null || v===undefined) return NaN;
+  let s=String(v).replace(/[$,%]/g,'').replace(/[()]/g,'').trim();
+  let n=parseFloat(s);
+  if(String(v).includes('(')) n=-n;
+  return n;
+}
+function pctChange(cur,prev){
+  const a=numClean(cur), b=numClean(prev);
+  if(!isFinite(a)||!isFinite(b)||b===0) return null;
+  return (a-b)/Math.abs(b)*100;
+}
+function fmtDelta(x){
+  if(x===null||!isFinite(x)) return '—';
+  const cls=x>0?'up':x<0?'down':'flat';
+  return `<span class="metric-delta ${cls}">${x>0?'+':''}${x.toFixed(1)}%</span>`;
+}
+function ratio(n,d){ return d ? (n/d*100) : NaN; }
+
+function renderSelfCompare(ticker){
+  const d=stockLabData[ticker]; if(!d)return;
+  const labels = {
+    'Net revenue':'Revenue','Net sales':'Revenue','Revenue':'Revenue',
+    'Gross profit':'Gross Profit','Gross margin':'Gross Profit',
+    'Operating income':'Operating Income','Net income':'Net Income','Diluted EPS':'Diluted EPS'
+  };
+  const wanted = ['Revenue','Gross Profit','Operating Income','Net Income','Diluted EPS'];
+  const rows = [];
+  for(const r of d.pnl){
+    const canonical=labels[r[0]]||r[0];
+    if(wanted.includes(canonical)) rows.push([canonical,r[1],r[2]]);
+  }
+  const notes={
+    'Revenue':'公司做的生意規模是否擴大。',
+    'Gross Profit':'產品／服務在直接成本後留下多少。',
+    'Operating Income':'本業扣掉 R&D、SG&A 等後的獲利。',
+    'Net Income':'所有主要費用與稅之後的最後淨利。',
+    'Diluted EPS':'把淨利分到每一股後，股東真正更在意的數字。'
+  };
+  document.getElementById('selfCompareBody').innerHTML=rows.map(r=>`
+    <tr class="${['Revenue','Operating Income','Net Income','Diluted EPS'].includes(r[0])?'major':''}">
+      <td>${r[0]}</td><td class="numcell">${r[1]}</td><td class="numcell">${r[2]}</td>
+      <td class="numcell">${fmtDelta(pctChange(r[1],r[2]))}</td><td>${notes[r[0]]||''}</td>
+    </tr>`).join('');
+
+  const interp=compareInterpret[ticker];
+  document.getElementById('selfInterpretation').innerHTML=
+    `<b>讀法：</b>${interp.one}<br>${interp.two}<br><span class="muted">${interp.three}</span>`;
+
+  const rev=rows.find(r=>r[0]==='Revenue');
+  const oi=rows.find(r=>r[0]==='Operating Income');
+  const eps=rows.find(r=>r[0]==='Diluted EPS');
+  const cards=[
+    ['Revenue YoY',rev?fmtDelta(pctChange(rev[1],rev[2])):'—','先看公司有沒有長大'],
+    ['Operating Income YoY',oi?fmtDelta(pctChange(oi[1],oi[2])):'—','再看獲利是否跟得上'],
+    ['EPS YoY',eps?fmtDelta(pctChange(eps[1],eps[2])):'—','最後看每股結果']
+  ];
+  document.getElementById('selfSummary').innerHTML=cards.map(c=>`
+    <div class="card"><small class="muted">${c[0]}</small><strong style="display:block;font-size:24px;margin:5px 0">${c[1]}</strong><span class="muted">${c[2]}</span></div>
+  `).join('');
+}
+
+
+document.getElementById('selfCompareTicker').addEventListener('change',e=>renderSelfCompare(e.target.value));
+renderSelfCompare('MRVL');
+
+
+
+const checks = [...document.querySelectorAll('.learn')];
+function updateProgress(){
+  let n=0;
+  checks.forEach(c=>{
+    const saved=localStorage.getItem('mrvl_'+c.dataset.key)==='1';
+    c.checked=saved;
+    if(saved)n++;
+  });
+  document.getElementById('progressText').textContent=`${n} / ${checks.length} 個核心概念`;
+  document.getElementById('progressBar').style.width=`${100*n/checks.length}%`;
+}
+checks.forEach(c=>c.addEventListener('change',()=>{
+  localStorage.setItem('mrvl_'+c.dataset.key,c.checked?'1':'0');updateProgress();
+}));
+updateProgress();
+
+function gradeQuiz(){
+  const ans={q1:'b',q2:'c',q3:'c'};
+  let s=0,done=0;
+  for(const q in ans){
+    const el=document.querySelector(`input[name="${q}"]:checked`);
+    if(el){done++; if(el.value===ans[q])s++;}
+  }
+  const out=document.getElementById('quizResult');
+  if(done<3){out.textContent='還有題目沒有作答。';out.className='warn';return;}
+  out.textContent=`你答對 ${s}/3 題。`+(s===3?' 核心邏輯已抓到。':' 建議回頭看 Guidance 與 GAAP / Non-GAAP 兩章。');
+  out.className=s===3?'good':'warn';
+}
+const fields=['quarter','date','rev','growth','gm','eps','ocf','guide','facts','infers','unknowns','bear','impact','next'];
+function saveWorksheet(){
+  fields.forEach(id=>localStorage.setItem('mrvl_ws_'+id,document.getElementById(id).value));
+  document.getElementById('saveStatus').textContent='已儲存在這台瀏覽器。下次開啟同一檔案仍可繼續填寫。';
+}
+fields.forEach(id=>{
+  const v=localStorage.getItem('mrvl_ws_'+id);
+  if(v!==null)document.getElementById(id).value=v;
+});
+</script>
+</body>
+</html>
